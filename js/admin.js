@@ -1,7 +1,36 @@
 import { supabase } from './supabase.js';
 
 // ==========================================
-// 1. SELECCIÓN DE ELEMENTOS DEL DOM
+// 1. SEGURIDAD Y ACCESO AL PANEL (PASSWORD)
+// ==========================================
+const PASSWORD_ADMIN = "sena2026*"; // Puedes cambiar la contraseña aquí
+
+function verificarAutenticacion() {
+    const estaAutenticado = sessionStorage.getItem('admin_auth');
+    const overlayLogin = document.getElementById('admin-login-overlay');
+
+    if (estaAutenticado === 'true') {
+        if (overlayLogin) overlayLogin.classList.add('hidden');
+        document.body.classList.remove('bloqueado');
+        return true;
+    } else {
+        document.body.classList.add('bloqueado');
+        if (overlayLogin) overlayLogin.classList.remove('hidden');
+        return false;
+    }
+}
+
+// Botón para cerrar sesión
+const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener('click', () => {
+        sessionStorage.removeItem('admin_auth');
+        window.location.reload();
+    });
+}
+
+// ==========================================
+// 2. SELECCIÓN DE ELEMENTOS DEL DOM
 // ==========================================
 const modalCandidato = document.getElementById('modal-candidato');
 const modalJornada = document.getElementById('modal-jornada');
@@ -16,7 +45,7 @@ const btnAgregarJornada = document.getElementById('btn-agregar-jornada');
 const botonesCerrar = document.querySelectorAll('[data-close]');
 
 // ==========================================
-// 2. LÓGICA DE LAS VENTANAS MODALES
+// 3. LÓGICA DE LAS VENTANAS MODALES
 // ==========================================
 btnAgregarCandidato.addEventListener('click', () => {
     formCandidato.reset();
@@ -42,7 +71,7 @@ botonesCerrar.forEach(boton => {
 });
 
 // ==========================================
-// 3. LECTURA: CARGAR DATOS INICIALES
+// 4. LECTURA: CARGAR DATOS INICIALES
 // ==========================================
 async function cargarJornadasSelect() {
     const { data, error } = await supabase.from('jornadas').select('*');
@@ -73,14 +102,14 @@ async function cargarCandidatos() {
         listaCandidatos.innerHTML = '<p>No hay candidatos registrados aún.</p>';
         document.getElementById('total-candidatos').textContent = "0";
         document.getElementById('total-votos').textContent = "0";
-        renderizarGrafica(); // Actualiza o limpia la gráfica
+        renderizarGrafica();
         return;
     }
 
     let html = `
-        <table class="tabla-admin" style="width: 100%; text-align: left; border-collapse: collapse;">
+        <table class="tabla-admin">
             <thead>
-                <tr style="border-bottom: 2px solid var(--sena-verde);">
+                <tr>
                     <th>Foto</th>
                     <th>Nombre</th>
                     <th>Ficha</th>
@@ -101,8 +130,8 @@ async function cargarCandidatos() {
         totalVotosGeneral += candidato.votos;
         
         html += `
-            <tr style="border-bottom: 1px solid #ccc;">
-                <td style="padding: 10px 0;">${foto}</td>
+            <tr>
+                <td>${foto}</td>
                 <td>${candidato.nombre_completo}</td>
                 <td>${candidato.numero_ficha}</td>
                 <td>${candidato.programa_formacion}</td>
@@ -110,7 +139,7 @@ async function cargarCandidatos() {
                 <td><strong>${candidato.votos}</strong></td>
                 <td>
                     <button onclick="window.prepararEdicion(${candidato.id})" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;">Modificar</button>
-                    <button onclick="window.prepararEliminacion(${candidato.id})" class="btn btn-danger" style="background-color: #d32f2f; color: white; padding: 5px 10px; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                    <button onclick="window.prepararEliminacion(${candidato.id})" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;">Eliminar</button>
                 </td>
             </tr>
         `;
@@ -119,16 +148,14 @@ async function cargarCandidatos() {
     html += '</tbody></table>';
     listaCandidatos.innerHTML = html;
     
-    // Actualizamos estadísticas
     document.getElementById('total-candidatos').textContent = data.length;
     document.getElementById('total-votos').textContent = totalVotosGeneral;
 
-    // ¡Renderizamos o actualizamos la gráfica con Chart.js!
     renderizarGrafica();
 }
 
 // ==========================================
-// 4. GRÁFICA EN TIEMPO REAL (CHART.JS)
+// 5. GRÁFICA EN TIEMPO REAL (CHART.JS)
 // ==========================================
 let myChart = null;
 
@@ -139,7 +166,6 @@ async function renderizarGrafica() {
 
     if (error || !data) return;
 
-    // Agrupamos votos por jornada
     const resumen = {};
     data.forEach(c => {
         const nombreJornada = c.jornadas ? c.jornadas.nombre : 'Sin jornada';
@@ -155,7 +181,7 @@ async function renderizarGrafica() {
     const ctx = canvasElement.getContext('2d');
 
     if (myChart) {
-        myChart.destroy(); // Destruimos la gráfica anterior para evitar conflictos de sobreescritura
+        myChart.destroy();
     }
 
     myChart = new Chart(ctx, {
@@ -165,7 +191,7 @@ async function renderizarGrafica() {
             datasets: [{
                 label: 'Total de Votos por Jornada',
                 data: valores.length > 0 ? valores : [0],
-                backgroundColor: '#39A900', // Verde SENA
+                backgroundColor: '#39A900',
                 borderRadius: 6
             }]
         },
@@ -182,7 +208,7 @@ async function renderizarGrafica() {
 }
 
 // ==========================================
-// 5. AGREGAR Y MODIFICAR (CON FOTO)
+// 6. AGREGAR Y MODIFICAR (CON FOTO)
 // ==========================================
 formCandidato.addEventListener('submit', async (e) => {
     e.preventDefault(); 
@@ -254,7 +280,7 @@ formCandidato.addEventListener('submit', async (e) => {
 });
 
 // ==========================================
-// 6. PREPARAR EDICIÓN Y ELIMINACIÓN
+// 7. PREPARAR EDICIÓN Y ELIMINACIÓN
 // ==========================================
 window.prepararEdicion = async (id) => {
     const { data, error } = await supabase.from('candidatos').select('*').eq('id', id).single();
@@ -291,7 +317,7 @@ document.getElementById('btn-confirmar-eliminar').addEventListener('click', asyn
 });
 
 // ==========================================
-// 7. TIEMPO REAL
+// 8. TIEMPO REAL
 // ==========================================
 function activarTiempoReal() {
     supabase
@@ -307,7 +333,7 @@ function activarTiempoReal() {
 }
 
 // ==========================================
-// 8. EXPORTACIÓN DE REPORTES (PDF Y EXCEL)
+// 9. EXPORTACIÓN DE REPORTES (PDF Y EXCEL)
 // ==========================================
 async function obtenerDatosParaReporte() {
     const { data, error } = await supabase
@@ -459,11 +485,42 @@ if (btnReiniciarVotacion) {
 }
 
 // ==========================================
-// 9. INICIALIZAR EL PANEL
+// 10. INICIALIZAR EL PANEL (CON CONTROL DE LOGIN)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    cargarJornadasSelect();
-    cargarListaJornadas();
-    cargarCandidatos();
-    activarTiempoReal();
+    // Verificamos si ya inició sesión en esta pestaña
+    const autorizado = verificarAutenticacion();
+
+    if (autorizado) {
+        cargarJornadasSelect();
+        cargarListaJornadas();
+        cargarCandidatos();
+        activarTiempoReal();
+    }
+
+    const formLogin = document.getElementById('form-login-admin');
+    const inputPassword = document.getElementById('admin-password');
+    const mensajeError = document.getElementById('error-login');
+
+    if (formLogin) {
+        formLogin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (inputPassword.value === PASSWORD_ADMIN) {
+                sessionStorage.setItem('admin_auth', 'true');
+                mensajeError.style.display = 'none';
+                
+                verificarAutenticacion();
+                
+                cargarJornadasSelect();
+                cargarListaJornadas();
+                cargarCandidatos();
+                activarTiempoReal();
+            } else {
+                mensajeError.style.display = 'block';
+                inputPassword.value = '';
+                inputPassword.focus();
+            }
+        });
+    }
 });

@@ -14,7 +14,6 @@
     --exito: #065F46;
 }
 
-/* Reseteo básico y tipografía */
 * {
     box-sizing: border-box;
 }
@@ -27,8 +26,13 @@ body {
     line-height: 1.6;
 }
 
-/* Ocultar elementos (vital para los modales) */
 .hidden {
+    display: none !important;
+}
+
+/* Ocultar contenido mientras está bloqueado el panel */
+body.bloqueado .admin-container,
+body.bloqueado .admin-header {
     display: none !important;
 }
 
@@ -139,6 +143,7 @@ body {
     border-radius: 6px;
     border: 1px solid var(--sena-gris-borde);
     transition: all 0.2s;
+    font-size: 0.9rem;
 }
 
 .btn-volver:hover {

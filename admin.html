@@ -6,29 +6,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - SENA</title>
     <link rel="icon" href="image/logo_sena.jpg" type="image/png">
-
     <link rel="stylesheet" href="../CSS/admin.css">
 
-    <!-- Librerías para exportar a PDF, Excel y mostrar Gráficas -->
+    <!-- Librerías para exportar a PDF, Excel y Gráficas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body>
+<body class="bloqueado">
 
-    <header class="admin-header votacion-header">
-        <div class="admin-brand" style="display: flex; align-items: center; gap: 1.5rem;">
-            <div class="logo-container">
-                <img src="image/logo_sena.jpg" alt="Logo oficial del SENA" class="logo-sena-img" style="height: 50px; width: auto; object-fit: contain;">
-            </div>
-            <div>
-                <h1 style="margin: 0; font-size: 1.4rem;">Panel de Administración</h1>
-                <p style="margin: 0; font-size: 0.9rem; color: #64748B;">Sistema Oficial de Votación SENA</p>
+    <!-- PANTALLA DE ACCESO (LOGIN DE ADMINISTRADOR) -->
+    <div id="admin-login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F8FAFC; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 100%; max-width: 400px; border: 1px solid #E2E8F0; text-align: center;">
+            <h2 style="color: #1F2937; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.5rem;">Panel Protegido</h2>
+            <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 1.5rem;">Ingresa la contraseña de administrador para continuar.</p>
+            
+            <form id="form-login-admin">
+                <div style="margin-bottom: 1.2rem; text-align: left;">
+                    <label for="admin-password" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: #1F2937;">Contraseña</label>
+                    <input type="password" id="admin-password" placeholder="Contraseña de acceso" required style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 1rem; background-color: #F9FAFB;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 600;">Ingresar al Panel</button>
+            </form>
+            <p id="error-login" style="color: #DC2626; font-size: 0.85rem; margin-top: 1rem; display: none; font-weight: 600;">Contraseña incorrecta. Intenta de nuevo.</p>
+            
+            <div style="margin-top: 1.5rem; border-top: 1px solid #E2E8F0; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <a href="index.html" style="color: #64748B; text-decoration: none; font-size: 0.9rem; font-weight: 600;">← Volver al inicio</a>
             </div>
         </div>
-        <a href="index.html" class="btn-volver">← Volver a votación</a>
+    </div>
+
+    <header class="admin-header">
+        <div class="admin-brand" style="display: flex; align-items: center; gap: 1.5rem;">
+            <div class="logo-container">
+                <img src="image/logo_sena.jpg" alt="Logo oficial del SENA" class="logo-sena-img">
+            </div>
+            <div>
+                <h1>Panel de Administración</h1>
+                <p>Sistema Oficial de Votación SENA</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="index.html" class="btn-volver">Ir a Votación</a>
+            <button type="button" id="btn-cerrar-sesion" class="btn btn-danger" style="padding: 0.6rem 1rem; font-size: 0.9rem;">Cerrar Sesión</button>
+        </div>
     </header>
 
     <main class="admin-container">
@@ -50,7 +73,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN DE GRÁFICA EN TIEMPO REAL -->
+        <!-- GRÁFICA EN TIEMPO REAL -->
         <section class="admin-section">
             <div class="section-title">
                 <div>
@@ -72,7 +95,7 @@
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button type="button" id="btn-exportar-pdf" class="btn btn-secondary">📄 Exportar a PDF</button>
                     <button type="button" id="btn-exportar-excel" class="btn btn-primary" style="background-color: #1D6F42;">📊 Exportar a Excel</button>
-                    <button type="button" id="btn-reiniciar-votacion" class="btn btn-danger" style="background-color: #DC2626; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer;">🔄 Reiniciar Votación</button>
+                    <button type="button" id="btn-reiniciar-votacion" class="btn btn-danger">🔄 Reiniciar Votación</button>
                 </div>
             </div>
         </section>
