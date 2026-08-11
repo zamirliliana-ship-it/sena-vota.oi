@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votaciones SENA - Elige a tu representante</title>
+    <link rel="icon" href="image/logo_sena.jpg" type="image/png">
+    <!-- Salimos de HTML y entramos a CSS -->
+    <link rel="stylesheet" href="../CSS/styles.css">
+</head>
+<body>
+
+    <header class="votacion-header">
+        <div class="logo-container">
+            <img src="image/logo_sena.jpg" alt="Logo oficial del SENA" class="logo-sena-img" style="height: 50px; width: auto; object-fit: contain;">
+        </div>
+        <div>
+            <h1>Elecciones de Representantes</h1>
+            <p>Sistema Oficial de Votación - Servicio Nacional de Aprendizaje (SENA)</p>
+        </div>
+    </header>
+
+    <main role="main" class="votacion-container">
+    
+        <div id="mensaje-sistema" role="alert" aria-live="polite" class="hidden"></div>
+
+        <section aria-labelledby="titulo-candidatos">
+            <h2 id="titulo-candidatos">Candidatos Disponibles</h2>
+            
+            <!-- Contenedor con estilos visuales y centrado -->
+            <div class="filtro-container">
+                <label for="filtro-jornada">Selecciona tu jornada para votar:</label>
+                <select id="filtro-jornada">
+                    <option value="">-- Selecciona una jornada --</option>
+                </select>
+            </div>
+
+            <div id="candidatos-grid" class="grid-candidatos">
+                <div class="cargando" aria-busy="true">
+                    Cargando los candidatos, por favor espera...
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pie de página institucional -->
+    <footer class="sena-footer" style="text-align: center; padding: 2rem; margin-top: 3rem; background-color: #ffffff; border-top: 1px solid #E2E8F0; color: #64748B; font-size: 0.9rem;">
+        <p><strong>Servicio Nacional de Aprendizaje - SENA</strong></p>
+        <p>Sistema de Elecciones de Representantes de Aprendices</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">© 2026 Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Salimos de HTML y entramos a JS -->
+    <script type="module" src="../JS/votacion.js"></script>
+</body>
+</html>

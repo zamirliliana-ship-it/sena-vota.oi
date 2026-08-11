@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - SENA</title>
+    <link rel="icon" href="image/logo_sena.jpg" type="image/png">
+
+    <link rel="stylesheet" href="../CSS/admin.css">
+
+    <!-- Librerías para exportar a PDF, Excel y mostrar Gráficas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <header class="admin-header votacion-header">
+        <div class="admin-brand" style="display: flex; align-items: center; gap: 1.5rem;">
+            <div class="logo-container">
+                <img src="image/logo_sena.jpg" alt="Logo oficial del SENA" class="logo-sena-img" style="height: 50px; width: auto; object-fit: contain;">
+            </div>
+            <div>
+                <h1 style="margin: 0; font-size: 1.4rem;">Panel de Administración</h1>
+                <p style="margin: 0; font-size: 0.9rem; color: #64748B;">Sistema Oficial de Votación SENA</p>
+            </div>
+        </div>
+        <a href="index.html" class="btn-volver">← Volver a votación</a>
+    </header>
+
+    <main class="admin-container">
+
+        <section class="estadisticas">
+            <div class="estadistica-card">
+                <span class="estadistica-icon">🗳️</span>
+                <div>
+                    <strong id="total-votos">0</strong>
+                    <span>Votos registrados</span>
+                </div>
+            </div>
+            <div class="estadistica-card">
+                <span class="estadistica-icon">👥</span>
+                <div>
+                    <strong id="total-candidatos">0</strong>
+                    <span>Candidatos</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE GRÁFICA EN TIEMPO REAL -->
+        <section class="admin-section">
+            <div class="section-title">
+                <div>
+                    <h2>Resultados Gráficos</h2>
+                    <p>Visualización en tiempo real de la participación por jornada.</p>
+                </div>
+            </div>
+            <div style="width: 100%; max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <canvas id="graficaJornadas"></canvas>
+            </div>
+        </section>
+
+        <section class="admin-section" id="reportes">
+            <div class="section-title">
+                <div>
+                    <h2>Exportación y Control</h2>
+                    <p>Descarga los resultados o reinicia el proceso de votación.</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" id="btn-exportar-pdf" class="btn btn-secondary">📄 Exportar a PDF</button>
+                    <button type="button" id="btn-exportar-excel" class="btn btn-primary" style="background-color: #1D6F42;">📊 Exportar a Excel</button>
+                    <button type="button" id="btn-reiniciar-votacion" class="btn btn-danger" style="background-color: #DC2626; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer;">🔄 Reiniciar Votación</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-section">
+            <div class="section-title">
+                <div>
+                    <h2>Jornadas</h2>
+                    <p>Administra las jornadas disponibles.</p>
+                </div>
+                <button type="button" id="btn-agregar-jornada" class="btn btn-primary">+ Agregar jornada</button>
+            </div>
+            <div id="jornadas-lista" class="tabla-container">
+                <div class="cargando">Cargando jornadas...</div>
+            </div>
+        </section>
+
+        <section class="admin-section">
+            <div class="section-title">
+                <div>
+                    <h2>Candidatos</h2>
+                    <p>Agrega, modifica o elimina candidatos.</p>
+                </div>
+                <button type="button" id="btn-agregar-candidato" class="btn btn-primary">+ Agregar candidato</button>
+            </div>
+            <div id="candidatos-lista" class="tabla-container">
+                <div class="cargando">Cargando candidatos...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL JORNADA -->
+    <div id="modal-jornada" class="modal hidden">
+        <div class="modal-content">
+            <button type="button" class="modal-close" data-close="modal-jornada" aria-label="Cerrar">×</button>
+            <h2 id="modal-jornada-titulo">Agregar jornada</h2>
+            <form id="form-jornada">
+                <input type="hidden" id="jornada-id">
+                <div class="form-group">
+                    <label for="jornada-nombre">Nombre de la jornada</label>
+                    <input type="text" id="jornada-nombre" placeholder="Ejemplo: Diurna" required maxlength="100">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-jornada">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-guardar-jornada">Guardar jornada</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CANDIDATO -->
+    <div id="modal-candidato" class="modal hidden">
+        <div class="modal-content modal-candidato">
+            <button type="button" class="modal-close" data-close="modal-candidato" aria-label="Cerrar">×</button>
+            <h2 id="modal-candidato-titulo">Agregar candidato</h2>
+            <form id="form-candidato">
+                <input type="hidden" id="candidato-id">
+
+                <div class="form-group">
+                    <label for="candidato-nombre">Nombre completo</label>
+                    <input type="text" id="candidato-nombre" placeholder="Nombre del candidato" required maxlength="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="candidato-jornada">Jornada</label>
+                    <select id="candidato-jornada" required>
+                        <option value="">Seleccionar jornada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="candidato-ficha">Ficha</label>
+                    <input type="text" id="candidato-ficha" placeholder="Número de ficha" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="candidato-programa">Programa</label>
+                    <input type="text" id="candidato-programa" placeholder="Programa de formación" maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="candidato-foto">Fotografía</label>
+                    <input type="file" id="candidato-foto" accept="image/png, image/jpeg, image/jpg">
+                    <small>Sube una imagen desde tu computadora (opcional).</small>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-candidato">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-guardar-candidato">Guardar candidato</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMACIÓN -->
+    <div id="modal-confirmacion" class="modal hidden">
+        <div class="modal-content">
+            <div class="confirmacion-icon">⚠️</div>
+            <h2>Confirmar eliminación</h2>
+            <p id="confirmacion-texto">¿Está seguro de eliminar este registro?</p>
+            <div class="modal-actions">
+                <button type="button" id="btn-cancelar-eliminar" class="btn btn-secondary" data-close="modal-confirmacion">Cancelar</button>
+                <button type="button" id="btn-confirmar-eliminar" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../JS/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+/* =========================================
+   VARIABLES GLOBALES (Colores SENA)
+   ========================================= */
+:root {
+    --sena-verde: #39A900;
+    --sena-verde-hover: #2b7a00;
+    --sena-blanco: #FFFFFF;
+    --sena-negro: #2D2D2D;
+    --sena-gris-fondo: #F8FAFC;
+    --sena-gris-borde: #E2E8F0;
+    --sena-gris-texto: #64748B;
+    --peligro: #DC2626;
+    --peligro-hover: #B91C1C;
+    --exito: #065F46;
+}
+
+/* Reseteo básico y tipografía */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--sena-gris-fondo);
+    color: var(--sena-negro);
+    line-height: 1.6;
+}
+
+/* Ocultar elementos (vital para los modales) */
+.hidden {
+    display: none !important;
+}
+
+/* =========================================
+   ENCABEZADO (ADMIN NAVBAR)
+   ========================================= */
+.admin-header {
+    background-color: var(--sena-blanco);
+    border-bottom: 4px solid var(--sena-verde);
+    padding: 1rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-sena-img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
+.admin-brand h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--sena-negro);
+    font-weight: 700;
+}
+
+.admin-brand p {
+    margin: 0;
+    color: var(--sena-gris-texto);
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+.btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--sena-negro);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: var(--sena-verde);
+    color: var(--sena-blanco);
+}
+
+.btn-primary:hover {
+    background-color: var(--sena-verde-hover);
+}
+
+.btn-secondary {
+    background-color: #F1F5F9;
+    color: var(--sena-negro);
+    border: 1px solid var(--sena-gris-borde);
+}
+
+.btn-secondary:hover {
+    background-color: #E2E8F0;
+}
+
+.btn-danger {
+    background-color: var(--peligro);
+    color: var(--sena-blanco);
+}
+
+.btn-danger:hover {
+    background-color: var(--peligro-hover);
+}
+
+.btn-volver {
+    color: var(--sena-negro);
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #F1F5F9;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    border: 1px solid var(--sena-gris-borde);
+    transition: all 0.2s;
+}
+
+.btn-volver:hover {
+    background-color: var(--sena-verde);
+    color: white;
+    border-color: var(--sena-verde);
+}
+
+/* =========================================
+   CONTENEDOR PRINCIPAL Y SECCIONES
+   ========================================= */
+.admin-container {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+
+.admin-section {
+    background-color: var(--sena-blanco);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--sena-gris-borde);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--sena-gris-fondo);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-title h2 {
+    color: var(--sena-negro);
+    margin: 0 0 0.2rem 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.section-title p {
+    margin: 0;
+    color: var(--sena-gris-texto);
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   ESTADÍSTICAS (CARDS)
+   ========================================= */
+.estadisticas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.estadistica-card {
+    background-color: var(--sena-blanco);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--sena-gris-borde);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-left: 5px solid var(--sena-verde);
+}
+
+.estadistica-icon {
+    font-size: 2.2rem;
+}
+
+.estadistica-card strong {
+    display: block;
+    font-size: 1.8rem;
+    color: var(--sena-negro);
+    line-height: 1;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+
+.estadistica-card span {
+    color: var(--sena-gris-texto);
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   TABLAS DE DATOS
+   ========================================= */
+.tabla-container {
+    overflow-x: auto;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.tabla-admin th {
+    background-color: #F8FAFC;
+    color: var(--sena-negro);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid var(--sena-verde);
+    text-align: left;
+}
+
+.tabla-admin td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--sena-gris-borde);
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.tabla-admin tr:hover {
+    background-color: #F8FAFC;
+}
+
+/* =========================================
+   VENTANAS MODALES
+   ========================================= */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background-color: var(--sena-blanco);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.modal-candidato {
+    max-width: 550px;
+}
+
+.modal-content h2 {
+    color: var(--sena-negro);
+    margin-top: 0;
+    border-bottom: 2px solid var(--sena-gris-fondo);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--sena-gris-texto);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--peligro);
+}
+
+/* =========================================
+   FORMULARIOS
+   ========================================= */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--sena-negro);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--sena-gris-borde);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: #F9FAFB;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--sena-verde);
+    background-color: var(--sena-blanco);
+    box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.12);
+}
+
+.form-group small {
+    display: block;
+    color: var(--sena-gris-texto);
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* =========================================
+   MODAL CONFIRMACIÓN Y MENSAJES
+   ========================================= */
+.confirmacion-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#modal-confirmacion h2, 
+#modal-confirmacion p {
+    text-align: center;
+}
+
+.mensaje {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.mensaje.exito {
+    background-color: #ECFDF5;
+    color: var(--exito);
+    border: 1px solid #A7F3D0;
+}
+
+.mensaje.error {
+    background-color: #FEF2F2;
+    color: var(--peligro);
+    border: 1px solid #FECACA;
+}
