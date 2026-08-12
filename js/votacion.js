@@ -40,7 +40,6 @@ async function cargarCandidatosParaVotar() {
 
     todosLosCandidatos = data;
     
-    // Si ya había una jornada seleccionada, refrescamos la vista manteniendo el filtro
     if (jornadaActualSeleccionada) {
         mostrarCandidatosFiltrados(jornadaActualSeleccionada);
     } else {
@@ -68,17 +67,9 @@ function mostrarCandidatosFiltrados(jornadaIdSeleccionada) {
 
     gridCandidatos.innerHTML = '';
 
-    // Verificamos si este dispositivo ya votó por esta jornada
-    const yaVotoEnEstaJornada = localStorage.getItem(`voto_jornada_${jornadaIdSeleccionada}`);
-
     candidatosFiltrados.forEach(candidato => {
         const jornada = candidato.jornadas ? candidato.jornadas.nombre : 'Sin asignar';
         const fotoUrl = candidato.foto_url ? candidato.foto_url : 'https://via.placeholder.com/150?text=Sin+Foto';
-
-        // Si ya votó, deshabilitamos el botón para evitar spam
-        const botonDeshabilitado = yaVotoEnEstaJornada ? 'disabled' : '';
-        const textoBoton = yaVotoEnEstaJornada ? 'Ya votaste' : `Votar por ${candidato.nombre_completo}`;
-        const colorBoton = yaVotoEnEstaJornada ? 'background-color: #94A3B8; cursor: not-allowed;' : '';
 
         const tarjetaHTML = `
             <article class="tarjeta-candidato" tabindex="0">
@@ -92,11 +83,10 @@ function mostrarCandidatosFiltrados(jornadaIdSeleccionada) {
                 <button 
                     id="btn-votar-${candidato.id}"
                     class="btn btn-primary" 
-                    style="width: 100%; margin-top: 1rem; ${colorBoton}"
-                    ${botonDeshabilitado}
+                    style="width: 100%; margin-top: 1rem;"
                     onclick="window.registrarVoto(${candidato.id}, '${candidato.nombre_completo}', ${jornadaIdSeleccionada})"
                     aria-label="Votar por el candidato ${candidato.nombre_completo}">
-                    ${textoBoton}
+                    Votar por ${candidato.nombre_completo}
                 </button>
             </article>
         `;
@@ -110,17 +100,9 @@ selectFiltroJornada.addEventListener('change', (e) => {
 });
 
 // ==========================================
-// 4. LÓGICA PARA REGISTRAR EL VOTO
+// 4. LÓGICA PARA REGISTRAR EL VOTO (SIN BLOQUEO)
 // ==========================================
 window.registrarVoto = async (candidatoId, nombreCandidato, jornadaId) => {
-    
-    // Bloqueo extra por seguridad
-    if (localStorage.getItem(`voto_jornada_${jornadaId}`)) {
-        mostrarMensaje('Ya has registrado tu voto en esta jornada.', 'error');
-        return;
-    }
-
-    // Efecto de carga en el botón
     const btnVotar = document.getElementById(`btn-votar-${candidatoId}`);
     if (btnVotar) {
         btnVotar.textContent = 'Registrando...';
@@ -156,12 +138,10 @@ window.registrarVoto = async (candidatoId, nombreCandidato, jornadaId) => {
             btnVotar.disabled = false;
         }
     } else {
-        // Marcamos en el dispositivo que ya votó
-        localStorage.setItem(`voto_jornada_${jornadaId}`, 'true');
         mostrarMensaje(`¡Voto registrado exitosamente para ${nombreCandidato}!`, 'exito');
         
-        // Recargamos las tarjetas visualmente para bloquear los botones
-        mostrarCandidatosFiltrados(jornadaId);
+        // Recargamos los datos para refrescar la vista manteniendo los botones activos
+        cargarCandidatosParaVotar();
     }
 };
 
