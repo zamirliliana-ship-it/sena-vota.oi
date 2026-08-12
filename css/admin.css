@@ -406,3 +406,35 @@ body.bloqueado .admin-header {
     color: var(--peligro);
     border: 1px solid #FECACA;
 }
+
+/* ==========================================
+   RESPONSIVE PARA EL ENCABEZADO ADMIN
+   ========================================= */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1.2rem 1rem;
+    }
+
+    .admin-brand {
+        width: 100%;
+    }
+
+    /* Contenedor de los botones superiores en móvil */
+    .admin-header > div:last-child {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .admin-header .btn-volver,
+    .admin-header #btn-cerrar-sesion {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.85rem;
+    }
+}
