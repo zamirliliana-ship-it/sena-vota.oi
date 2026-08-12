@@ -48,7 +48,7 @@ async function cargarCandidatosParaVotar() {
 }
 
 // ==========================================
-// 3. RENDERIZAR LAS CARTAS SEGÚN EL FILTRO
+// 3. RENDERIZAR LAS CARTAS LIBRES DE RESTRICCIONES
 // ==========================================
 function mostrarCandidatosFiltrados(jornadaIdSeleccionada) {
     jornadaActualSeleccionada = jornadaIdSeleccionada;
@@ -100,7 +100,7 @@ selectFiltroJornada.addEventListener('change', (e) => {
 });
 
 // ==========================================
-// 4. LÓGICA PARA REGISTRAR EL VOTO (SIN BLOQUEO)
+// 4. LÓGICA PARA REGISTRAR EL VOTO
 // ==========================================
 window.registrarVoto = async (candidatoId, nombreCandidato, jornadaId) => {
     const btnVotar = document.getElementById(`btn-votar-${candidatoId}`);
@@ -139,8 +139,6 @@ window.registrarVoto = async (candidatoId, nombreCandidato, jornadaId) => {
         }
     } else {
         mostrarMensaje(`¡Voto registrado exitosamente para ${nombreCandidato}!`, 'exito');
-        
-        // Recargamos los datos para refrescar la vista manteniendo los botones activos
         cargarCandidatosParaVotar();
     }
 };
