@@ -68,9 +68,17 @@ function mostrarCandidatosFiltrados(jornadaIdSeleccionada) {
 
     gridCandidatos.innerHTML = '';
 
+    // Verificamos si este dispositivo ya votó por esta jornada
+    const yaVotoEnEstaJornada = localStorage.getItem(`voto_jornada_${jornadaIdSeleccionada}`);
+
     candidatosFiltrados.forEach(candidato => {
         const jornada = candidato.jornadas ? candidato.jornadas.nombre : 'Sin asignar';
         const fotoUrl = candidato.foto_url ? candidato.foto_url : 'https://via.placeholder.com/150?text=Sin+Foto';
+
+        // Si ya votó, deshabilitamos el botón para evitar spam
+        const botonDeshabilitado = yaVotoEnEstaJornada ? 'disabled' : '';
+        const textoBoton = yaVotoEnEstaJornada ? 'Ya votaste' : `Votar por ${candidato.nombre_completo}`;
+        const colorBoton = yaVotoEnEstaJornada ? 'background-color: #94A3B8; cursor: not-allowed;' : '';
 
         const tarjetaHTML = `
             <article class="tarjeta-candidato" tabindex="0">
@@ -82,10 +90,13 @@ function mostrarCandidatosFiltrados(jornadaIdSeleccionada) {
                     <p><strong>Jornada:</strong> ${jornada}</p>
                 </div>
                 <button 
-                    class="btn-votar" 
-                    onclick="window.registrarVoto(${candidato.id}, '${candidato.nombre_completo}')"
+                    id="btn-votar-${candidato.id}"
+                    class="btn btn-primary" 
+                    style="width: 100%; margin-top: 1rem; ${colorBoton}"
+                    ${botonDeshabilitado}
+                    onclick="window.registrarVoto(${candidato.id}, '${candidato.nombre_completo}', ${jornadaIdSeleccionada})"
                     aria-label="Votar por el candidato ${candidato.nombre_completo}">
-                    Votar por ${candidato.nombre_completo}
+                    ${textoBoton}
                 </button>
             </article>
         `;
@@ -101,7 +112,21 @@ selectFiltroJornada.addEventListener('change', (e) => {
 // ==========================================
 // 4. LÓGICA PARA REGISTRAR EL VOTO
 // ==========================================
-window.registrarVoto = async (candidatoId, nombreCandidato) => {
+window.registrarVoto = async (candidatoId, nombreCandidato, jornadaId) => {
+    
+    // Bloqueo extra por seguridad
+    if (localStorage.getItem(`voto_jornada_${jornadaId}`)) {
+        mostrarMensaje('Ya has registrado tu voto en esta jornada.', 'error');
+        return;
+    }
+
+    // Efecto de carga en el botón
+    const btnVotar = document.getElementById(`btn-votar-${candidatoId}`);
+    if (btnVotar) {
+        btnVotar.textContent = 'Registrando...';
+        btnVotar.disabled = true;
+    }
+
     const { data: candidatoActual, error: errorLectura } = await supabase
         .from('candidatos')
         .select('votos')
@@ -109,7 +134,11 @@ window.registrarVoto = async (candidatoId, nombreCandidato) => {
         .single();
 
     if (errorLectura) {
-        mostrarMensaje('Error al procesar el voto. Intenta de nuevo.', 'error');
+        mostrarMensaje('Error al procesar el voto. Revisa los permisos (RLS) en Supabase.', 'error');
+        if (btnVotar) {
+            btnVotar.textContent = `Votar por ${nombreCandidato}`;
+            btnVotar.disabled = false;
+        }
         return;
     }
 
@@ -121,9 +150,18 @@ window.registrarVoto = async (candidatoId, nombreCandidato) => {
         .eq('id', candidatoId);
 
     if (errorActualizacion) {
-        mostrarMensaje('No se pudo registrar el voto en la base de datos.', 'error');
+        mostrarMensaje('No se pudo guardar el voto. Verifica la seguridad (RLS) en Supabase.', 'error');
+        if (btnVotar) {
+            btnVotar.textContent = `Votar por ${nombreCandidato}`;
+            btnVotar.disabled = false;
+        }
     } else {
+        // Marcamos en el dispositivo que ya votó
+        localStorage.setItem(`voto_jornada_${jornadaId}`, 'true');
         mostrarMensaje(`¡Voto registrado exitosamente para ${nombreCandidato}!`, 'exito');
+        
+        // Recargamos las tarjetas visualmente para bloquear los botones
+        mostrarCandidatosFiltrados(jornadaId);
     }
 };
 
@@ -137,7 +175,6 @@ function activarTiempoRealVotacion() {
             'postgres_changes',
             { event: '*', schema: 'public', table: 'candidatos' },
             () => {
-                // Sincroniza la información de los candidatos en segundo plano cuando hay votos
                 cargarCandidatosParaVotar();
             }
         )
