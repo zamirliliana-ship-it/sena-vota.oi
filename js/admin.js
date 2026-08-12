@@ -1,9 +1,9 @@
 import { supabase } from './supabase.js';
 
 // ==========================================
-// 1. SEGURIDAD Y ACCESO AL PANEL (PASSWORD)
+// 1. SEGURIDAD Y ACCESO CON SUPABASE AUTH
 // ==========================================
-const PASSWORD_ADMIN = "sena2026*"; // Puedes cambiar la contraseña aquí
+const ADMIN_EMAIL = "admin@sena.edu.co"; // Correo registrado en Supabase Auth
 
 function verificarAutenticacion() {
     const estaAutenticado = sessionStorage.getItem('admin_auth');
@@ -23,7 +23,8 @@ function verificarAutenticacion() {
 // Botón para cerrar sesión
 const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener('click', () => {
+    btnCerrarSesion.addEventListener('click', async () => {
+        await supabase.auth.signOut();
         sessionStorage.removeItem('admin_auth');
         window.location.reload();
     });
@@ -485,10 +486,9 @@ if (btnReiniciarVotacion) {
 }
 
 // ==========================================
-// 10. INICIALIZAR EL PANEL (CON CONTROL DE LOGIN)
+// 10. INICIALIZAR EL PANEL (CON SUPABASE AUTH)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificamos si ya inició sesión en esta pestaña
     const autorizado = verificarAutenticacion();
 
     if (autorizado) {
@@ -503,10 +503,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const mensajeError = document.getElementById('error-login');
 
     if (formLogin) {
-        formLogin.addEventListener('submit', (e) => {
+        formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (inputPassword.value === PASSWORD_ADMIN) {
+            const password = inputPassword.value;
+
+            // Autenticación segura mediante Supabase Auth
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: ADMIN_EMAIL,
+                password: password,
+            });
+
+            if (error) {
+                mensajeError.style.display = 'block';
+                mensajeError.textContent = "Contraseña incorrecta. Intenta de nuevo.";
+                inputPassword.value = '';
+                inputPassword.focus();
+            } else {
                 sessionStorage.setItem('admin_auth', 'true');
                 mensajeError.style.display = 'none';
                 
@@ -516,10 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 cargarListaJornadas();
                 cargarCandidatos();
                 activarTiempoReal();
-            } else {
-                mensajeError.style.display = 'block';
-                inputPassword.value = '';
-                inputPassword.focus();
             }
         });
     }
